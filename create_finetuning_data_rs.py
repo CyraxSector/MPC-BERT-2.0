@@ -1,24 +1,24 @@
 # coding=utf-8
+import collections
 import json
 import random
-import numpy as np
-import collections
-from tqdm import tqdm
-import tokenization
-import tensorflow as tf
 
+import tensorflow as tf
+from tqdm import tqdm
+
+import tokenization
 
 """ Hu et al. GSN: A Graph-Structured Network for Multi-Party Dialogues. IJCAI 2019. """
-tf.flags.DEFINE_string("train_file", "./data/ijcai2019/train.json", 
-                       "path to train file")
-tf.flags.DEFINE_string("valid_file", "./data/ijcai2019/dev.json", 
-                       "path to valid file")
-tf.flags.DEFINE_string("test_file", "./data/ijcai2019/test.json", 
-                       "path to test file")
-tf.flags.DEFINE_integer("max_seq_length", 230, 
-                        "max sequence length of concatenated context and response")
-tf.flags.DEFINE_integer("max_utr_num", 7, 
-                        "Maximum utterance number.")
+tf.compat.v1.flags.DEFINE_string("train_file", "./data/ijcai2019/train.json",
+                                 "path to train file")
+tf.compat.v1.flags.DEFINE_string("valid_file", "./data/ijcai2019/dev.json",
+                                 "path to valid file")
+tf.compat.v1.flags.DEFINE_string("test_file", "./data/ijcai2019/test.json",
+                                 "path to test file")
+tf.compat.v1.flags.DEFINE_integer("max_seq_length", 230,
+                                  "max sequence length of concatenated context and response")
+tf.compat.v1.flags.DEFINE_integer("max_utr_num", 7,
+                                  "Maximum utterance number.")
 
 """ 
 Ouchi et al. Addressee and Response Selection for Multi-Party Conversation. EMNLP 2016.
@@ -64,25 +64,24 @@ Le et al. Who Is Speaking to Whom? Learning to Identify Utterance Addressee in M
 # tf.flags.DEFINE_integer("max_utr_num", 15, 
 #                         "Maximum utterance number.")
 
-tf.flags.DEFINE_string("vocab_file", "./uncased_L-12_H-768_A-12/vocab.txt", 
-                       "path to vocab file")
-tf.flags.DEFINE_bool("do_lower_case", True,
-                     "whether to lower case the input text")
-
+tf.compat.v1.flags.DEFINE_string("vocab_file", "./uncased_L-12_H-768_A-12/vocab.txt",
+                                 "path to vocab file")
+tf.compat.v1.flags.DEFINE_bool("do_lower_case", True,
+                               "whether to lower case the input text")
 
 
 def print_configuration_op(FLAGS):
     print('My Configurations:')
     for name, value in FLAGS.__flags.items():
-        value=value.value
+        value = value.value
         if type(value) == float:
-            print(' %s:\t %f'%(name, value))
+            print(' %s:\t %f' % (name, value))
         elif type(value) == int:
-            print(' %s:\t %d'%(name, value))
+            print(' %s:\t %d' % (name, value))
         elif type(value) == str:
-            print(' %s:\t %s'%(name, value))
+            print(' %s:\t %s' % (name, value))
         elif type(value) == bool:
-            print(' %s:\t %s'%(name, value))
+            print(' %s:\t %s' % (name, value))
         else:
             print('%s:\t %s' % (name, value))
     print('End of configuration')
@@ -150,8 +149,8 @@ def create_examples(lines, set_type):
         rsp = tokenization.convert_to_unicode(line[4])
         rsp_spk = line[5]
         label = tokenization.convert_to_unicode(line[-1])
-        examples.append(InputExample(guid=guid, ctx_id=ctx_id, ctx=ctx, ctx_spk=ctx_spk, 
-                                                rsp_id=rsp_id, rsp=rsp, rsp_spk=rsp_spk, label=label))
+        examples.append(InputExample(guid=guid, ctx_id=ctx_id, ctx=ctx, ctx_spk=ctx_spk,
+                                     rsp_id=rsp_id, rsp=rsp, rsp_spk=rsp_spk, label=label))
     return examples
 
 
@@ -175,6 +174,7 @@ def truncate_seq_pair(tokens_a, tokens_b, max_length):
 
 class InputFeatures(object):
     """A single set of features of data."""
+
     def __init__(self, ctx_id, rsp_id, input_sents, input_mask, segment_ids, speaker_ids, label_id):
         self.ctx_id = ctx_id
         self.rsp_id = rsp_id
@@ -204,14 +204,13 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
             utr_spk = example.ctx_spk[i]
             utr_tokens = tokenizer.tokenize(utr)
             ctx_tokens.extend(utr_tokens)
-            ctx_spk.extend([utr_spk]*len(utr_tokens))
+            ctx_spk.extend([utr_spk] * len(utr_tokens))
         assert len(ctx_tokens) == len(ctx_spk)
 
         rsp_tokens = tokenizer.tokenize(example.rsp)
 
         # Account for [CLS], [SEP], [SEP] with "- 3"
         truncate_seq_pair(ctx_tokens, rsp_tokens, max_seq_length - 3)
-
 
         tokens = []
         segment_ids = []
@@ -254,7 +253,7 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
         features.append(
             InputFeatures(
                 ctx_id=ctx_id,
-                rsp_id = rsp_id,
+                rsp_id=rsp_id,
                 input_sents=input_sents,
                 input_mask=input_mask,
                 segment_ids=segment_ids,
@@ -268,7 +267,7 @@ def write_instance_to_example_files(instances, output_files):
     writers = []
 
     for output_file in output_files:
-        writers.append(tf.python_io.TFRecordWriter(output_file))
+        writers.append(tf.compat.v1.python_io.TFRecordWriter(output_file))
 
     writer_index = 0
     total_written = 0
@@ -298,7 +297,7 @@ def write_instance_to_example_files(instances, output_files):
         values = feature.int64_list.value
     elif feature.float_list.value:
         values = feature.float_list.value
-    tf.logging.info(
+    tf.compat.v1.logging.info(
         "%s: %s" % (feature_name, " ".join([str(x) for x in values])))
 
     for writer in writers:
@@ -306,18 +305,18 @@ def write_instance_to_example_files(instances, output_files):
 
 
 def create_int_feature(values):
-	feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-	return feature
+    feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+    return feature
+
 
 def create_float_feature(values):
-	feature = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
-	return feature
-
+    feature = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
+    return feature
 
 
 if __name__ == "__main__":
 
-    FLAGS = tf.flags.FLAGS
+    FLAGS = tf.compat.v1.flags.FLAGS
     print_configuration_op(FLAGS)
 
     tokenizer = tokenization.FullTokenizer(vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)

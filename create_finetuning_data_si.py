@@ -7,18 +7,17 @@ from tqdm import tqdm
 import tokenization
 import tensorflow as tf
 
-
 """ Hu et al. GSN: A Graph-Structured Network for Multi-Party Dialogues. IJCAI 2019. """
-tf.flags.DEFINE_string("train_file", "./data/ijcai2019/train.json", 
-                       "path to train file")
-tf.flags.DEFINE_string("valid_file", "./data/ijcai2019/dev.json", 
-                       "path to valid file")
-tf.flags.DEFINE_string("test_file", "./data/ijcai2019/test.json", 
-                       "path to test file")
-tf.flags.DEFINE_integer("max_seq_length", 230, 
-                        "max sequence length of concatenated context and response")
-tf.flags.DEFINE_integer("max_utr_num", 7, 
-                        "Maximum utterance number.")
+tf.compat.v1.flags.DEFINE_string("train_file", "./data/ijcai2019/train.json",
+                                 "path to train file")
+tf.compat.v1.flags.DEFINE_string("valid_file", "./data/ijcai2019/dev.json",
+                                 "path to valid file")
+tf.compat.v1.flags.DEFINE_string("test_file", "./data/ijcai2019/test.json",
+                                 "path to test file")
+tf.compat.v1.flags.DEFINE_integer("max_seq_length", 230,
+                                  "max sequence length of concatenated context and response")
+tf.compat.v1.flags.DEFINE_integer("max_utr_num", 7,
+                                  "Maximum utterance number.")
 
 """ 
 Ouchi et al. Addressee and Response Selection for Multi-Party Conversation. EMNLP 2016.
@@ -64,25 +63,24 @@ Le et al. Who Is Speaking to Whom? Learning to Identify Utterance Addressee in M
 # tf.flags.DEFINE_integer("max_utr_num", 15, 
 #                         "Maximum utterance number.")
 
-tf.flags.DEFINE_string("vocab_file", "./uncased_L-12_H-768_A-12/vocab.txt", 
-                       "path to vocab file")
-tf.flags.DEFINE_bool("do_lower_case", True,
-                     "whether to lower case the input text")
-
+tf.compat.v1.flags.DEFINE_string("vocab_file", "./uncased_L-12_H-768_A-12/vocab.txt",
+                                 "path to vocab file")
+tf.compat.v1.flags.DEFINE_bool("do_lower_case", True,
+                               "whether to lower case the input text")
 
 
 def print_configuration_op(FLAGS):
     print('My Configurations:')
     for name, value in FLAGS.__flags.items():
-        value=value.value
+        value = value.value
         if type(value) == float:
-            print(' %s:\t %f'%(name, value))
+            print(' %s:\t %f' % (name, value))
         elif type(value) == int:
-            print(' %s:\t %d'%(name, value))
+            print(' %s:\t %d' % (name, value))
         elif type(value) == str:
-            print(' %s:\t %s'%(name, value))
+            print(' %s:\t %s' % (name, value))
         elif type(value) == bool:
-            print(' %s:\t %s'%(name, value))
+            print(' %s:\t %s' % (name, value))
         else:
             print('%s:\t %s' % (name, value))
     print('End of configuration')
@@ -97,8 +95,8 @@ def load_dataset(fname):
             ctx_spk = data['ctx_spk']
             rsp = data['answer']
             rsp_spk = data['ans_spk']
-            assert len(ctx) ==len(ctx_spk)
-            
+            assert len(ctx) == len(ctx_spk)
+
             utrs_same_spk_with_rsp_spk = []
             for utr_id, utr_spk in enumerate(ctx_spk):
                 if utr_spk == rsp_spk:
@@ -112,7 +110,7 @@ def load_dataset(fname):
                 label[utr_id] = 1
 
             dataset.append((ctx, ctx_spk, rsp, rsp_spk, label))
-            
+
     print("dataset_size: {}".format(len(dataset)))
     return dataset
 
@@ -165,6 +163,7 @@ def truncate_seq_pair(ctx_tokens, rsp_tokens, max_length):
 
 class InputFeatures(object):
     """A single set of features of data."""
+
     def __init__(self, input_sents, input_mask, segment_ids, speaker_ids, cls_positions, rsp_position, label_id):
         self.input_sents = input_sents
         self.input_mask = input_mask
@@ -192,7 +191,6 @@ def convert_examples_to_features(examples, max_seq_length, max_utr_num, tokenize
         # [CLS]s for context, [CLS] for response, [SEP]
         max_num_tokens = max_seq_length - len(ctx_tokens) - 1 - 1
         truncate_seq_pair(ctx_tokens, rsp_tokens, max_num_tokens)
-
 
         tokens = []
         segment_ids = []
@@ -234,7 +232,6 @@ def convert_examples_to_features(examples, max_seq_length, max_utr_num, tokenize
         # speaker_ids.append(example.rsp_spk)
         speaker_ids.append(0)
 
-        
         input_sents = tokenizer.convert_tokens_to_ids(tokens)
         input_mask = [1] * len(input_sents)
         assert len(input_sents) <= max_seq_length
@@ -276,7 +273,7 @@ def write_instance_to_example_files(instances, output_files):
     writers = []
 
     for output_file in output_files:
-        writers.append(tf.python_io.TFRecordWriter(output_file))
+        writers.append(tf.compat.v1.python_io.TFRecordWriter(output_file))
 
     writer_index = 0
     total_written = 0
@@ -306,7 +303,7 @@ def write_instance_to_example_files(instances, output_files):
         values = feature.int64_list.value
     elif feature.float_list.value:
         values = feature.float_list.value
-    tf.logging.info(
+    tf.compat.v1.logging.info(
         "%s: %s" % (feature_name, " ".join([str(x) for x in values])))
 
     for writer in writers:
@@ -314,18 +311,18 @@ def write_instance_to_example_files(instances, output_files):
 
 
 def create_int_feature(values):
-	feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
-	return feature
+    feature = tf.train.Feature(int64_list=tf.train.Int64List(value=list(values)))
+    return feature
+
 
 def create_float_feature(values):
-	feature = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
-	return feature
-
+    feature = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
+    return feature
 
 
 if __name__ == "__main__":
 
-    FLAGS = tf.flags.FLAGS
+    FLAGS = tf.compat.v1.flags.FLAGS
     print_configuration_op(FLAGS)
 
     tokenizer = tokenization.FullTokenizer(vocab_file=FLAGS.vocab_file, do_lower_case=FLAGS.do_lower_case)

@@ -647,7 +647,7 @@ def create_pointer_consistency_distinction_predictions(ctx_spk, ctx_adr, ctx_rel
         for spk_utr in utrs:
             adr_utr = -1
             for adr_utr_tmp in spk_to_utrs[adr]:
-                if adr_utr_tmp < spk_utr and adr_utr_tmp > adr_utr:
+                if spk_utr > adr_utr_tmp > adr_utr:
                     adr_utr = adr_utr_tmp
             positive_relation.append([spk_utr, adr_utr])
 
