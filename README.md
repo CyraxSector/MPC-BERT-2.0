@@ -1,12 +1,6 @@
 # MPC-BERT-2.0: An Upgraded Pre-Trained Language Model for Multi-Party Conversation Understanding
 This repository contains the upgraded source code version of MPC-BERT: A Pre-Trained Language Model for Multi-Party Conversation Understanding (https://github.com/JasonForJoy/MPC-BERT) <br>
 
-
-## Introduction
-Recently, various neural models for multi-party conversation (MPC) have achieved impressive improvements on a variety of tasks such as addressee recognition, speaker identification and response prediction. 
-However, these existing methods on MPC usually represent interlocutors and utterances individually and ignore the inherent complicated structure in MPC which may provide crucial interlocutor and utterance semantics and would enhance the conversation understanding process. 
-MPC-BERT has been introduced to address the MPC understanding that considers learning who says what to whom in a unified model with several elaborated self-supervised tasks.
-MPC-BERT repository contains the source code for the _ACL 2021_ paper [MPC-BERT: A Pre-Trained Language Model for Multi-Party Conversation Understanding](https://aclanthology.org/2021.acl-long.285.pdf). Jia-Chen Gu, Chongyang Tao, Zhen-Hua Ling, Can Xu, Xiubo Geng, Daxin Jiang.
 MPC-BERT-2.0 is an upgraded version which supports for Tensorflow version 2.
 
 
