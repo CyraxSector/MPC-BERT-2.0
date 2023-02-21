@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Run (MLM + NSP + RUR + ISS + PCD + MSUR + SND) pre-training for MPC-BERT."""
+"""Run (MLM + NSP + RUR + ISS + PCD + MSUR + SND) pre-training for MPC-BERT-2.0."""
 
 from __future__ import absolute_import
 from __future__ import division

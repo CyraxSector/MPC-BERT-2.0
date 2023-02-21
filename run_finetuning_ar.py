@@ -1,5 +1,5 @@
 # coding=utf-8
-"""MPC-BERT finetuning runner on the downstream task of addressee recognition."""
+"""MPC-BERT-2.0 fine-tuning runner on the downstream task of addressee recognition."""
 
 from __future__ import absolute_import
 from __future__ import division

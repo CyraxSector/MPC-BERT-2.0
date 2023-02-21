@@ -1,5 +1,5 @@
 # coding=utf-8
-"""MPC-BERT testing runner on the downstream task of response selection."""
+"""MPC-BERT-2.0 testing runner on the downstream task of response selection."""
 
 from __future__ import absolute_import
 from __future__ import division

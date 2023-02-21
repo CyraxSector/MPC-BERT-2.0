@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Create (MLM + NSP + RUR + ISS + PCD + MSUR + SND) TF examples for MPC-BERT."""
+"""Create (MLM + NSP + RUR + ISS + PCD + MSUR + SND) TF examples for MPC-BERT-2.0."""
 
 from __future__ import absolute_import
 from __future__ import division
