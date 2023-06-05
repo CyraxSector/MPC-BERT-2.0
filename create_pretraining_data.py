@@ -473,6 +473,12 @@ def create_next_sentence_predictions(tokens, segment_ids, speaker_ids, rsp_pos_t
 
     if random.random() < 0.5:
         rsp_tokens = rsp_neg_tokens
+        # is_random_next is to indicate the possibility of being the next utterance (sentence) in the conversation.
+        # a similar logic to BertForNextSentencePrediction() should be used to generate the semantic similarity of
+        # each utterance in the conversation. This is because, this logic works well for comparing two subsequent
+        # sentences from one doc, with 50% the second sentence will be a random one from another doc.
+        # The proposing modification is to check the is_random_next logic for each utterance in the conversation
+        # rather than considering only the last utterance.
         is_random_next = True
     else:
         rsp_tokens = rsp_pos_tokens
@@ -589,9 +595,18 @@ def create_identical_speaker_searching_predictions(speaker_ids, ctx_spk, cls_pos
     masked_sr_labels = []
     for utrs in cand_utrs_with_same_spk:
         if len(masked_sr_positions) >= max_predictions_per_seq_sr:
+            # This logic has to be replaced considering the discourse relations between
+            # each utterance in the MPC using the logic of DialogueGCN.
             break
 
         label_masked = random.sample(utrs, 2)
+        # This logic has to be replaced considering the discourse relations between each utterance in the MPC.
+        # Step 1: get the least length of utrs_with_same_spk (replacing random.sample(utrs, 2)).
+        # Step 2: identify masked_sr_positions and masked_sr_labels considering the cls_positions of ctx_spk.
+        #         cls_positions represents relative positional embeddings which encode the relative semantic distance.
+        # Step 3: set speaker_ids to 0 of the identified masked_utr.
+        # Step 4: append the respective masked_sr_positions and masked_sr_labels.
+        # Step 5: return speaker_ids, masked_sr_positions, masked_sr_labels.
         label_masked = sorted(label_masked)
         label_utr = label_masked[0]
         masked_utr = label_masked[1]
